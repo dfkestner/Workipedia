@@ -20,10 +20,16 @@ const useStyles = makeStyles({
 export default function BasicTable() {
     const classes = useStyles();
     const [users, setUsers] = useState([]);
+    const [search, setSearch] = useState("");
 
     useEffect(() => {
         getResult();
     }, []);
+
+    const handleInputChange = event => {
+        const { value } = event.target
+        setSearch(value);
+    }
 
     const getResult = () => {
         API.getUsers().then(response => {
@@ -35,58 +41,69 @@ export default function BasicTable() {
         });
     };
 
-    function sortName() {
-        this.setState({
-            users: users.sort((a, b) =>
-                a.fullname > b.fullname ? 1 : -1
-            )
-        })
+    const sortName = async () => {
+        try {
+            setUsers(users.sort((a,b)=> a.fullname > b.fullname ? 1 : -1))
+            //const nameSort = await users.sort((a, b) =>
+               // a.fullname > b.fullname ? 1 : -1)
+            //setUsers(nameSort);
+            console.log(users)
+        } catch (error) {
+            console.log(error)
+        }
     }
 
-    function sortPhone() {
-        this.setState({
-            users: users.sort((a, b) =>
-                a.phone > b.phone ? 1 : -1
-            )
-        })
+    const sortPhone = async () => {
+        try {
+            const phoneSort = await users.sort((a, b) =>
+                a.phone > b.phone ? 1 : -1)
+            setUsers(phoneSort);
+            console.log(users)
+        } catch (error) {
+            console.log(error)
+        }
     }
 
-    function sortEmail() {
-        this.setState({
-            users: users.sort((a, b) =>
-                a.email > b.email ? 1 : -1
-            )
-        })
+    const sortEmail = async () => {
+        try {
+            const emailSort = await users.sort((a, b) =>
+                a.email > b.email ? 1 : -1)
+            setUsers(emailSort);
+            console.log(users)
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     return (
         <TableContainer component={Paper}>
-            <TextField/>
+            <TextField search={search} handleInputChange={handleInputChange} />
             <Table className={classes.table} aria-label="simple table">
                 <TableHead>
                     <TableRow>
                         <TableCell>Image</TableCell>
-                        <TableCell 
+                        <TableCell
                             align="center"
-                            onClick={() => {sortName()}}>Name</TableCell>
-                        <TableCell 
+                            onClick={() => { sortName() }}>Name</TableCell>
+                        <TableCell
                             align="center"
-                            onClick={() => {sortPhone()}}>Phone</TableCell>
-                        <TableCell 
+                            onClick={() => { sortPhone() }}>Phone</TableCell>
+                        <TableCell
                             align="center"
-                            onClick={() => {sortEmail()}}>Email</TableCell>
+                            onClick={() => { sortEmail() }}>Email</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {users.map((user, i) => (
-                        <ResultRow
-                            key={i}
-                            thumbnail={user.picture.thumbnail} 
-                            fullname={user.fullname}
-                            phone={user.phone}
-                            email={user.email}
-                        />
-                    ))}
+                    {users.filter(user => user.fullname.toLowerCase().includes(search.toLowerCase()))
+                        .map((user, i) => (
+                            <ResultRow
+                                key={i}
+                                thumbnail={user.picture.thumbnail}
+                                fullname={user.fullname}
+                                phone={user.phone}
+                                email={user.email}
+                            />
+                        ))}
                 </TableBody>
             </Table>
         </TableContainer>
